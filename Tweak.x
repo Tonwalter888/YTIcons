@@ -79,9 +79,9 @@ static const NSInteger TweakSection = 'ytic';
     }
 
     if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)]) {
-        YTIIcon *sectionIcon = [%c(YTIIcon) new];
-        sectionIcon.iconType = YT_SETTINGS;
-        [settingsViewController setSectionItems:sectionItems forCategory:TweakSection title:TweakName icon:sectionIcon titleDescription:nil headerHidden:NO];
+        YTIIcon *icon = [%c(YTIIcon) new];
+        icon.iconType = YT_SETTINGS;
+        [settingsViewController setSectionItems:sectionItems forCategory:TweakSection title:TweakName icon:icon titleDescription:nil headerHidden:NO];
     } else
         [settingsViewController setSectionItems:sectionItems forCategory:TweakSection title:TweakName titleDescription:nil headerHidden:NO];
 }
