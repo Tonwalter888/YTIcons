@@ -1,9 +1,9 @@
 Package: com.ps.yticons
 Name: YTIcons
-Version: 1.0.0
+Version: 1.1.0
 Architecture: iphoneos-arm
 Description: List all YTIIcon icons.
 Maintainer: PoomSmart
 Author: PoomSmart
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 11.0), com.ps.ytabconfig, com.ps.yougroupsettings
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 11.0), com.ps.ytabconfig

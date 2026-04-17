@@ -3,13 +3,14 @@
 #import <YouTubeHeader/YTSettingsViewController.h>
 #import <YouTubeHeader/YTSettingsSectionItem.h>
 #import <YouTubeHeader/YTSettingsSectionItemManager.h>
+#import <YouTubeHeader/YTIIcon.h>
 #import <rootless.h>
 
 #define TweakName @"YTIcons"
 
-static const NSInteger YTIconsSection = 'ytic';
+static const NSInteger TweakSection = 'ytic';
 
-@interface YTSettingsSectionItemManager (Tweak)
+@interface YTSettingsSectionItemManager (YTIcons)
 - (void)updateYTIconsSectionWithEntry:(id)entry;
 @end
 
@@ -17,8 +18,20 @@ static const NSInteger YTIconsSection = 'ytic';
 
 - (void)loadWithModel:(id)model fromView:(UIView *)view {
     %orig;
-    if ([[self valueForKey:@"_detailsCategoryID"] integerValue] == YTIconsSection)
+    if ([[self valueForKey:@"_detailsCategoryID"] integerValue] == TweakSection)
         [self setValue:@(YES) forKey:@"_shouldShowSearchBar"];
+}
+
+%end
+
+%hook YTSettingsGroupData
+
+- (NSArray <NSNumber *> *)orderedCategories {
+    if (self.type != 1 || class_getClassMethod(objc_getClass("YTSettingsGroupData"), @selector(tweaks)))
+        return %orig;
+    NSMutableArray *mutableCategories = %orig.mutableCopy;
+    [mutableCategories insertObject:@(TweakSection) atIndex:0];
+    return mutableCategories.copy;
 }
 
 %end
@@ -27,9 +40,13 @@ static const NSInteger YTIconsSection = 'ytic';
 
 + (NSArray <NSNumber *> *)settingsCategoryOrder {
     NSArray <NSNumber *> *order = %orig;
-    NSMutableArray <NSNumber *> *mutableOrder = [order mutableCopy];
-    [mutableOrder insertObject:@(YTIconsSection) atIndex:0];
-    return mutableOrder.copy;
+    NSUInteger insertIndex = [order indexOfObject:@(1)];
+    if (insertIndex != NSNotFound) {
+        NSMutableArray <NSNumber *> *mutableOrder = [order mutableCopy];
+        [mutableOrder insertObject:@(TweakSection) atIndex:insertIndex + 1];
+        order = mutableOrder.copy;
+    }
+    return order;
 }
 
 %end
@@ -61,13 +78,15 @@ static const NSInteger YTIconsSection = 'ytic';
     }
 
     if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)])
-        [settingsViewController setSectionItems:sectionItems forCategory:YTIconsSection title:TweakName icon:nil titleDescription:nil headerHidden:NO];
+        YTIIcon *icon = [%c(YTIIcon) new];
+        icon.iconType = YT_SETTINGS;
+        [settingsViewController setSectionItems:sectionItems forCategory:TweakSection title:TweakName icon:icon titleDescription:nil headerHidden:NO];
     else
-        [settingsViewController setSectionItems:sectionItems forCategory:YTIconsSection title:TweakName titleDescription:nil headerHidden:NO];
+        [settingsViewController setSectionItems:sectionItems forCategory:TweakSection title:TweakName titleDescription:nil headerHidden:NO];
 }
 
 - (void)updateSectionForCategory:(NSUInteger)category withEntry:(id)entry {
-    if (category == YTIconsSection) {
+    if (category == TweakSection) {
         [self updateYTIconsSectionWithEntry:entry];
         return;
     }
